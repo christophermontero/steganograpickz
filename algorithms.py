@@ -2,7 +2,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 
 
-class AlgRSA():
+class CipherRSA():
     def __init__(self):
         self.publicKeyRSA = None
         self.privateKeyRSA = None
@@ -34,3 +34,18 @@ class AlgRSA():
         self.decryptContent = cipherRSA.decrypt(self.encryptContent)
 
         return self.decryptContent
+
+
+class CipherAES():
+    def __init__(self):
+        self.sessionKey = None
+        self.plainText = None
+        self.plainText2Bytes = None
+        self.cipherText = None
+        self.iv = None
+        self.ivEcrypt = None
+        self.sessionKeyEncrypt = None
+
+    def function():
+        pass
+        
