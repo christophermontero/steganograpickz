@@ -12,3 +12,10 @@ class algRSA():
 		self.publicKey = key.publicKey().export_key()
 
 		return self.privateKey, self.publicKey
+
+	def encryptKey(self, keySession):
+		recipientKey = RSA.import_key(self.publicKey)
+		cipherRSA = PKCS1_OAEP.new(recipientKey)
+		encryptKey = cipherRSA.encrypt(keySession)
+
+		return encryptKey
