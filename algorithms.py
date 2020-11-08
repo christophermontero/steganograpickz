@@ -1,5 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
 
 
 class CipherRSA():
@@ -21,14 +23,14 @@ class CipherRSA():
         self.publicKeyRSA.write(key.publickey().export_key())
         self.publicKeyRSA.close()
 
-    def encrypt(self, content):
+    def encrypted(self, content):
         recipientKey = RSA.import_key(open("public.pem").read())
         cipherRSA = PKCS1_OAEP.new(recipientKey)
         self.encryptContent = cipherRSA.encrypt(content)
 
         return self.encryptContent
 
-    def decrypt(self):
+    def decrypted(self):
         recipientKey = RSA.import_key(open("private.pem").read())
         cipherRSA = PKCS1_OAEP.new(recipientKey)
         self.decryptContent = cipherRSA.decrypt(self.encryptContent)
@@ -37,15 +39,18 @@ class CipherRSA():
 
 
 class CipherAES():
-    def __init__(self):
-        self.sessionKey = None
-        self.plainText = None
-        self.plainText2Bytes = None
+    def __init__(self, text):
+        self.sessionKey = get_random_bytes(16)
+        self.plainText = text
+        self.plainText2Bytes = str.encode(self.plainText)
         self.cipherText = None
         self.iv = None
         self.ivEcrypt = None
         self.sessionKeyEncrypt = None
 
-    def function():
-        pass
-        
+    def encrypted(self):
+        cipher_aes = AES.new(self.sessionKey, AES.MODE_CBC)
+        self.cipherText = cipher_aes.encrypt(pad(self.plainText2Bytes, AES.block_size))
+        self.iv = cipher_aes.iv
+
+        return self.cipherText, self.iv
