@@ -45,8 +45,7 @@ class CipherAES():
         self.plainText2Bytes = str.encode(self.plainText)
         self.cipherText = None
         self.iv = None
-        self.ivEcrypt = None
-        self.sessionKeyEncrypt = None
+        self.plainTextDecrypt = None
 
     def encrypted(self):
         cipher_aes = AES.new(self.sessionKey, AES.MODE_CBC)
@@ -54,3 +53,9 @@ class CipherAES():
         self.iv = cipher_aes.iv
 
         return self.cipherText, self.iv
+
+    def decrypted(self):
+        cipherAES = AES.new(self.sessionKey, AES.MODE_CBC, self.iv)
+        self.plainTextDecrypt = unpad(cipherAES.decrypt(self.cipherText), AES.block_size).decode('utf-8')
+
+        return self.plainTextDecrypt
