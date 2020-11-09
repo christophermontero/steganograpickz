@@ -15,14 +15,13 @@ aesCBC = alg.CipherAES(message, "password")
 aesCBC.expandSessionKey()
 messageEncryptAES = aesCBC.encrypted()
 
-# cipherText plus initial vector plus session Key
-dataAES = messageEncryptAES[0] + "." + \
-    messageEncryptAES[1] + "." + messageEncryptAES[2]
+# cipherText plus initial vector
+dataAES = messageEncryptAES[0] + "." + messageEncryptAES[1]
 
-# Encrypt AES with RSA
+# Encrypt AES session key with RSA
 rsa = alg.CipherRSA()
 rsa.keyPair()
-messageEncryptRSA = rsa.encrypted(dataAES)
+sessionKeyEncryptRSA = rsa.encrypted(messageEncryptAES[2])
 
 # Key pairs are readed
 private = open("private.pem", "r")
@@ -35,7 +34,7 @@ public.close()
 # Secret content to be hidden into a image
 image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
-secretContent = messageEncryptRSA + pub + image.filled(pub)
+secretContent = sessionKeyEncryptRSA + pub + image.filled(pub)
 imageEncrypted = image.encrypted(secretContent)
 
 # The image is been decrypted
@@ -46,6 +45,10 @@ cv2.imwrite("image-tampered.png", imageEncrypted)
 # Decrypt with RSA
 messageDecryptRSA = rsa.decrypted(dataAESEncrypt)
 splitMessage = messageDecryptRSA.split('.')
+
+print(len(aesCBC.cipherText))
+print(len(aesCBC.iv))
+print(len(aesCBC.sessionKey))
 
 # Decrypt RSA with AES
 messageDecryptAES = aesCBC.decrypted(splitMessage[0], splitMessage[1], splitMessage[2])
