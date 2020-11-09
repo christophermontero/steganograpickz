@@ -15,7 +15,7 @@ aesCBC = alg.CipherAES(message, "password")
 aesCBC.expandSessionKey()
 messageEncryptAES = aesCBC.encrypted()
 
-# initial vector plus cipherText plus session Key
+# cipherText plus initial vector plus session Key
 dataAES = messageEncryptAES[0] + "." + \
     messageEncryptAES[1] + "." + messageEncryptAES[2]
 
@@ -41,7 +41,7 @@ imageEncrypted = image.encrypted(secretContent)
 # The image is been decrypted
 imageDecrypted = image.decrypted()
 dataAESEncrypt = secretContent[:256]
-cv2.imwrite("image-tampered.PNG", imageEncrypted)
+cv2.imwrite("image-tampered.png", imageEncrypted)
 
 # Decrypt with RSA
 messageDecryptRSA = rsa.decrypted(dataAESEncrypt)
@@ -53,7 +53,10 @@ messageDecryptAES = aesCBC.decrypted(splitMessage[0], splitMessage[1], splitMess
 output = ("Cipher text: " + b64encode(splitMessage[0]).decode('utf-8') + "\n" +
           "Initial vector: " + b64encode(splitMessage[1]).decode('utf-8') + "\n" +
           "Session key: " + b64encode(splitMessage[2]).decode('utf-8') + "\n" +
+          "Salt: " + b64encode(aesCBC.salt).decode('utf-8') + "\n" +
           "Message: " + messageDecryptAES + "\n"
           )
 
-print(output)
+outputDecrypted = open("output-decrypted.txt", "wb")
+outputDecrypted.write(output)
+outputDecrypted.close()

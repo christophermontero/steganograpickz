@@ -1,5 +1,5 @@
 # Message
-message.txt
+*.txt
 
 # RSA key
 *.pem
