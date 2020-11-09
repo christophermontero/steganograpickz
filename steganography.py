@@ -46,3 +46,26 @@ class Steganography:
                     else:
                         break
         return self.image
+
+    def decrypted(self):
+        binaryData = ""
+        for row in self.image:
+            for pixel in row:
+                r, g, b = self.binary(pixel)
+                binaryData += r[-1]
+                binaryData += g[-1]
+                binaryData += b[-1]
+
+        # Bytes list
+        allBytes = [binaryData[ i: i+8] for i in range(0, len(binaryData), 8)]
+
+        # Clean last byte
+        if len(allBytes[-1]) != 8:
+            allBytes = allBytes[:-1]
+
+        # Convert bytes to string
+        decryptData = ""
+        for byte in allBytes:
+            decryptData += chr(int(byte, 2))
+
+        return decryptData

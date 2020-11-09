@@ -22,12 +22,8 @@ rsa = alg.CipherRSA()
 rsa.keyPair()
 messageEncryptRSA = rsa.encrypted(dataAES)
 
-# Decrypt with RSA
-messageDecryptRSA = rsa.decrypted()
-
 # Decrypt RSA with AES
 messageDecryptAES = aesCBC.decrypted()
-print(messageDecryptAES)
 
 # Key pairs are readed
 private = open("private.pem","r")
@@ -37,12 +33,22 @@ public = open("public.pem","r")
 pub = public.read()
 public.close()
 
+# Secret content to be hidden into a image
 secretContent = messageEncryptRSA + pub
-
 image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
 imageEncrypted = image.encrypted(secretContent)
-
-cv2.imshow('Logo OpenCV',imageEncrypted)
+'''
+cv2.imshow('Image tampered', imageEncrypted)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+'''
+imageDecrypted = image.decrypted()
+test = secretContent[:256]
+
+# Decrypt with RSA
+messageDecryptRSA = rsa.decrypted(test)
+print(messageDecryptRSA)
+print(dataAES)
+#print(imageDecrypted)
+
