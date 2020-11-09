@@ -63,15 +63,14 @@ class CipherAES():
 
     def encrypted(self):
         # Cipher AES is called
-        cipher_aes = AES.new(self.sessionKey, AES.MODE_CBC)
-        self.cipherText = cipher_aes.encrypt(pad(self.plainText2Bytes, AES.block_size))
-        self.iv = cipher_aes.iv        
+        cipherAES = AES.new(self.sessionKey, AES.MODE_CBC)
+        self.cipherText = cipherAES.encrypt(pad(self.plainText2Bytes, AES.block_size))
+        self.iv = cipherAES.iv
 
-        return self.cipherText, self.iv
+        return self.cipherText, self.iv, self.sessionKey
 
     def decrypted(self):
         cipherAES = AES.new(self.sessionKey, AES.MODE_CBC, self.iv)
         self.plainTextDecrypt = unpad(cipherAES.decrypt(self.cipherText), AES.block_size).decode('utf-8')
 
         return self.plainTextDecrypt
-        
