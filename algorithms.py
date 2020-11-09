@@ -69,8 +69,8 @@ class CipherAES():
 
         return self.cipherText, self.iv, self.sessionKey
 
-    def decrypted(self):
-        cipherAES = AES.new(self.sessionKey, AES.MODE_CBC, self.iv)
-        self.plainTextDecrypt = unpad(cipherAES.decrypt(self.cipherText), AES.block_size).decode('utf-8')
+    def decrypted(self, cipherText, iv, sessionKey):
+        cipherAES = AES.new(sessionKey, AES.MODE_CBC, iv)
+        self.plainTextDecrypt = unpad(cipherAES.decrypt(cipherText), AES.block_size).decode('utf-8')
 
         return self.plainTextDecrypt
