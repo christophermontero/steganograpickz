@@ -1,4 +1,5 @@
 from base64 import b64encode
+import cv2
 
 import algorithms as alg
 import steganography as stegano
@@ -28,17 +29,20 @@ messageDecryptRSA = rsa.decrypted()
 messageDecryptAES = aesCBC.decrypted()
 print(messageDecryptAES)
 
-
+# Key pairs are readed
 private = open("private.pem","r")
 priv = private.read()
 private.close()
-
-public = open("private.pem","r")
+public = open("public.pem","r")
 pub = public.read()
 public.close()
 
-print(len(pub))
-print(len(priv))
+secretContent = messageEncryptRSA + pub
 
 image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
+imageEncrypted = image.encrypted(secretContent)
+
+cv2.imshow('Logo OpenCV',imageEncrypted)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
