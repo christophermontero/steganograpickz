@@ -14,7 +14,7 @@ aesCBC = alg.CipherAES(message, "password")
 aesCBC.expandSessionKey()
 messageEncryptAES = aesCBC.encrypted()
 
-dataAES = messageEncryptAES[0] + "." + messageEncryptAES[1] + "." + messageEncryptAES[2] # iv plus cipherText plus session Key
+dataAES = messageEncryptAES[0] + "." + messageEncryptAES[1] + "." + messageEncryptAES[2] # initial vector plus cipherText plus session Key
 
 # Encrypt AES with RSA
 rsa = alg.CipherRSA()
@@ -27,3 +27,18 @@ messageDecryptRSA = rsa.decrypted()
 # Decrypt RSA with AES
 messageDecryptAES = aesCBC.decrypted()
 print(messageDecryptAES)
+
+
+private = open("private.pem","r")
+priv = private.read()
+private.close()
+
+public = open("private.pem","r")
+pub = public.read()
+public.close()
+
+print(len(pub))
+print(len(priv))
+
+image = stegano.Steganography()
+image.readImg("plain-text-password.jpg")
