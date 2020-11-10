@@ -47,32 +47,24 @@ imageDecrypted = image.decrypted()
 # Split content from image decrypted
 cipherTextChunk = imageDecrypted[:len(messageEncryptAES[0])]
 ivChunk = imageDecrypted[len(messageEncryptAES[0]) : len(messageEncryptAES[0]) + 16]
-sessionKeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 : len(messageEncryptAES[0]) + 32]
+sessionKeyRSAChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 : len(messageEncryptAES[0]) + 32]
 saltChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 : len(messageEncryptAES[0]) + 32 + 256]
 publicKeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(messageEncryptAES[0]) + 32 + 256 + len(pub)]
-print(len(sessionKeyChunk))
-print(publicKeyChunk)
 
-'''
-# Decrypt with RSA
-messageDecryptRSA = rsa.decrypted(dataAESEncrypt)
+# Decrypt session key with RSA
+sessionKeyDecryptRSA = rsa.decrypted(sessionKeyRSAChunk, publicKeyChunk)
 splitMessage = messageDecryptRSA.split('.')
 
-print(len(aesCBC.cipherText))
-print(len(aesCBC.iv))
-print(len(aesCBC.sessionKey))
-
 # Decrypt RSA with AES
-messageDecryptAES = aesCBC.decrypted(splitMessage[0], splitMessage[1], splitMessage[2])
+messageDecryptAES = aesCBC.decrypted(cipherTextChunk, ivChunk, sessionKeyChunk)
 
-output = ("Cipher text: " + b64encode(splitMessage[0]).decode('utf-8') + "\n" +
-          "Initial vector: " + b64encode(splitMessage[1]).decode('utf-8') + "\n" +
-          "Session key: " + b64encode(splitMessage[2]).decode('utf-8') + "\n" +
-          "Salt: " + b64encode(aesCBC.salt).decode('utf-8') + "\n" +
+output = ("Cipher text: " + b64encode(cipherTextChunk).decode('utf-8') + "\n" +
+          "Initial vector: " + b64encode(ivChunk).decode('utf-8') + "\n" +
+          "Session key: " + b64encode(sessionKeyChunk).decode('utf-8') + "\n" +
+          "Salt: " + b64encode(saltChunk).decode('utf-8') + "\n" +
           "Message: " + messageDecryptAES + "\n"
           )
 
 outputDecrypted = open("output-decrypted.txt", "wb")
 outputDecrypted.write(output)
 outputDecrypted.close()
-'''
