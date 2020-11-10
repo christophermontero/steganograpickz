@@ -1,3 +1,14 @@
+# Message
+*.txt
+
+# RSA key
+*.pem
+
+# Images
+*.jpg
+*.png
+*.jpeg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
