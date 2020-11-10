@@ -79,7 +79,7 @@ def extracMsg(pick, password):
 	print("Image decrypted")
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Cipher and decipher text files using hybrid cipher')
+	parser = argparse.ArgumentParser(description='Steganography schema, which use AES-CBC and RSA')
 
 	# Declare arguments to pass from console
 	parser.add_argument('pick', help='Insert the name of image as input')
@@ -91,5 +91,5 @@ if __name__ == '__main__':
 
 	if args.hidden:
 		hiddenMesg(args.pick, args.password)
-	elif args.extrac:
+	else args.extrac:
 		extracMsg(args.pick, args.password)
