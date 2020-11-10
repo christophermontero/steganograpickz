@@ -3,21 +3,24 @@ import cv2
 import algorithms as alg
 import steganography as stegano
 
-
 # The message is readed
 fileUTF8 = open("message.txt", "r")
 message = fileUTF8.read()
 fileUTF8.close()
 
 # Encrypt message with AES
+print("The message is been encrypted with AES...")
 aesCBC = alg.CipherAES(message, "password")
 aesCBC.expandSessionKey()
 messageEncryptAES = aesCBC.encrypted()
+print("Message encrypted with AES")
 
 # Encrypt AES session key with RSA
+print("The session key is been encrypted with RSA...")
 rsa = alg.CipherRSA()
 rsa.keyPair()
 sessionKeyEncryptRSA = rsa.encrypted(messageEncryptAES[2])
+print("Session key encrypted with RSA")
 
 # Key pairs are readed
 private = open("private.pem", "r")
@@ -31,17 +34,21 @@ public.close()
 image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
 
-# cipherText plus initial vector plus session key plus salt plus public key RSA plus fill
+# cipherText plus initial vector plus session key plus salt plus private key RSA plus fill
 secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + priv + image.filled(messageEncryptAES[0], priv)
 
 # Secret content is hidden into the image
+print("The secret content is been hidden into a image...")
 imageEncrypted = image.encrypted(secretContent)
+print("Secret content hidden")
 
 # The image tampered is saved
 cv2.imwrite("image-tampered.png", imageEncrypted)
 
 # The image is been decrypted
+print("The image is been decrypted...")
 imageDecrypted = image.decrypted()
+
 
 # Split content from image decrypted
 cipherTextChunk = imageDecrypted[:len(messageEncryptAES[0])]
@@ -51,8 +58,9 @@ saltChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 + 256 : len(messageEnc
 privatekeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(messageEncryptAES[0]) + 32 + 256 + len(priv)]
 
 # Decrypt session key with RSA
+print("The session key is been decrypted with RSA...")
 sessionKeyChunk = rsa.decrypted(sessionKeyRSAChunk, privatekeyChunk)
-
+print("Session key decrypted with RSA")
 
 # Decrypt RSA with AES
 messageDecryptAES = aesCBC.decrypted(cipherTextChunk, ivChunk, sessionKeyChunk)
@@ -68,3 +76,4 @@ output = ("Cipher text: " + b64encode(cipherTextChunk).decode('utf-8') + "\n" +
 outputDecrypted = open("output-decrypted.txt", "wb")
 outputDecrypted.write(output)
 outputDecrypted.close()
+print("Image decrypted")
