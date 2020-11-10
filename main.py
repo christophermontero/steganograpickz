@@ -57,10 +57,12 @@ def extracMsg(pick, password):
 
 	# Decrypt session key with RSA
 	print("The session key is been decrypted with RSA...")
+	rsa = alg.CipherRSA()
 	sessionKeyDecryptRSA = rsa.decrypted(splitSecretContent[2], splitSecretContent[4])
 	print("Session key decrypted with RSA")
 
 	# Decrypt RSA with AES
+	aesCBC = alg.CipherAES()
 	messageDecryptAES = aesCBC.decrypted(splitSecretContent[0], splitSecretContent[1], sessionKeyDecryptRSA)
 
 	output = ("Cipher text: " + b64encode(splitSecretContent[0]).decode('utf-8') + "\n" +
@@ -90,4 +92,4 @@ if __name__ == '__main__':
 	if args.hidden:
 		hiddenMesg(args.pick, args.password)
 	elif args.extrac:
-		extracMsg(args.pick, argsl.password)
+		extracMsg(args.pick, args.password)

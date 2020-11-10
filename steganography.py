@@ -47,9 +47,9 @@ class Steganography:
                         break
         return self.image
 
-    def decrypted(self):
+    def decrypted(self, pick):
         binaryData = ""
-        for row in self.image:
+        for row in pick:
             for pixel in row:
                 r, g, b = self.binary(pixel)
                 binaryData += r[-1]
