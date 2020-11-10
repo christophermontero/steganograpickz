@@ -13,8 +13,8 @@ class Steganography:
         self.image = cv2.imread(path)
         self.noBytes = self.image.shape[0] * self.image.shape[1] * 3 // 8
 
-    def filled(self, publicKey):
-    	randomFill = self.noBytes - (256 + len(publicKey))
+    def filled(self, cipherText, privKey):
+    	randomFill = self.noBytes - (len(cipherText) + 16 + 256 + 16 + len(privKey))
     	self.padding = get_random_bytes(randomFill)
 
     	return self.padding

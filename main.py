@@ -32,7 +32,7 @@ image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
 
 # cipherText plus initial vector plus session key plus salt plus public key RSA plus fill
-secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + priv + image.filled(pub)
+secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + priv + image.filled(messageEncryptAES[0], priv)
 
 # Secret content is hidden into the image
 imageEncrypted = image.encrypted(secretContent)
