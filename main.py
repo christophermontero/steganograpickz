@@ -15,9 +15,6 @@ aesCBC = alg.CipherAES(message, "password")
 aesCBC.expandSessionKey()
 messageEncryptAES = aesCBC.encrypted()
 
-# cipherText plus initial vector
-dataAES = messageEncryptAES[0] + "." + messageEncryptAES[1]
-
 # Encrypt AES session key with RSA
 rsa = alg.CipherRSA()
 rsa.keyPair()
@@ -34,14 +31,29 @@ public.close()
 # Secret content to be hidden into a image
 image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
-secretContent = sessionKeyEncryptRSA + pub + image.filled(pub)
+
+# cipherText plus initial vector plus session key plus salt plus public key RSA plus fill
+secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + pub + image.filled(pub)
+
+# Secret content is hidden into the image
 imageEncrypted = image.encrypted(secretContent)
+
+# The image tampered is saved
+cv2.imwrite("image-tampered.png", imageEncrypted)
 
 # The image is been decrypted
 imageDecrypted = image.decrypted()
-dataAESEncrypt = secretContent[:256]
-cv2.imwrite("image-tampered.png", imageEncrypted)
 
+# Split content from image decrypted
+cipherTextChunk = imageDecrypted[:len(messageEncryptAES[0])]
+ivChunk = imageDecrypted[len(messageEncryptAES[0]) : len(messageEncryptAES[0]) + 16]
+sessionKeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 : len(messageEncryptAES[0]) + 32]
+saltChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 : len(messageEncryptAES[0]) + 32 + 256]
+publicKeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(messageEncryptAES[0]) + 32 + 256 + len(pub)]
+print(len(sessionKeyChunk))
+print(publicKeyChunk)
+
+'''
 # Decrypt with RSA
 messageDecryptRSA = rsa.decrypted(dataAESEncrypt)
 splitMessage = messageDecryptRSA.split('.')
@@ -63,3 +75,4 @@ output = ("Cipher text: " + b64encode(splitMessage[0]).decode('utf-8') + "\n" +
 outputDecrypted = open("output-decrypted.txt", "wb")
 outputDecrypted.write(output)
 outputDecrypted.close()
+'''
