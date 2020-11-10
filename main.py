@@ -33,7 +33,7 @@ image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
 
 # cipherText plus initial vector plus session key plus salt plus public key RSA plus fill
-secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + pub + image.filled(pub)
+secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + priv + image.filled(pub)
 
 # Secret content is hidden into the image
 imageEncrypted = image.encrypted(secretContent)
@@ -47,14 +47,16 @@ imageDecrypted = image.decrypted()
 # Split content from image decrypted
 cipherTextChunk = imageDecrypted[:len(messageEncryptAES[0])]
 ivChunk = imageDecrypted[len(messageEncryptAES[0]) : len(messageEncryptAES[0]) + 16]
-sessionKeyRSAChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 : len(messageEncryptAES[0]) + 32]
-saltChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 : len(messageEncryptAES[0]) + 32 + 256]
-publicKeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(messageEncryptAES[0]) + 32 + 256 + len(pub)]
+sessionKeyRSAChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 : len(messageEncryptAES[0]) + 16 + 256]
+saltChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 + 256 : len(messageEncryptAES[0]) + 32 + 256]
+privatekeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(messageEncryptAES[0]) + 32 + 256 + len(priv)]
 
 # Decrypt session key with RSA
-sessionKeyDecryptRSA = rsa.decrypted(sessionKeyRSAChunk, publicKeyChunk)
-splitMessage = messageDecryptRSA.split('.')
+sessionKeyChunk = rsa.decrypted(sessionKeyRSAChunk, privatekeyChunk)
+print(len(sessionKeyChunk))
+print(sessionKeyChunk)
 
+'''
 # Decrypt RSA with AES
 messageDecryptAES = aesCBC.decrypted(cipherTextChunk, ivChunk, sessionKeyChunk)
 
@@ -68,3 +70,4 @@ output = ("Cipher text: " + b64encode(cipherTextChunk).decode('utf-8') + "\n" +
 outputDecrypted = open("output-decrypted.txt", "wb")
 outputDecrypted.write(output)
 outputDecrypted.close()
+'''

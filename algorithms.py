@@ -31,8 +31,8 @@ class CipherRSA():
 
         return self.encryptContent
 
-    def decrypted(self, message):
-        recipientKey = RSA.import_key(open("private.pem").read())
+    def decrypted(self, message, privKey):
+        recipientKey = RSA.import_key(privKey)
         cipherRSA = PKCS1_OAEP.new(recipientKey)
         self.decryptContent = cipherRSA.decrypt(message)
 
