@@ -35,7 +35,7 @@ image = stegano.Steganography()
 image.readImg("plain-text-password.jpg")
 
 # cipherText plus initial vector plus session key plus salt plus private key RSA plus fill
-secretContent = messageEncryptAES[0] + messageEncryptAES[1] + sessionKeyEncryptRSA + aesCBC.salt + priv + image.filled(messageEncryptAES[0], priv)
+secretContent = messageEncryptAES[0] + "separator" + messageEncryptAES[1] + "separator" + sessionKeyEncryptRSA + "separator" + aesCBC.salt + "separator" + priv + "separator" + image.filled(messageEncryptAES[0], priv)
 
 # Secret content is hidden into the image
 print("The secret content is been hidden into a image...")
@@ -49,27 +49,22 @@ cv2.imwrite("image-tampered.png", imageEncrypted)
 print("The image is been decrypted...")
 imageDecrypted = image.decrypted()
 
-
-# Split content from image decrypted
-cipherTextChunk = imageDecrypted[:len(messageEncryptAES[0])]
-ivChunk = imageDecrypted[len(messageEncryptAES[0]) : len(messageEncryptAES[0]) + 16]
-sessionKeyRSAChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 : len(messageEncryptAES[0]) + 16 + 256]
-saltChunk = imageDecrypted[len(messageEncryptAES[0]) + 16 + 256 : len(messageEncryptAES[0]) + 32 + 256]
-privatekeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(messageEncryptAES[0]) + 32 + 256 + len(priv)]
+# The secret content is separated
+splitSecretContent = imageDecrypted.split('separator')
 
 # Decrypt session key with RSA
 print("The session key is been decrypted with RSA...")
-sessionKeyChunk = rsa.decrypted(sessionKeyRSAChunk, privatekeyChunk)
+sessionKeyDecryptRSA = rsa.decrypted(splitSecretContent[2], splitSecretContent[4])
 print("Session key decrypted with RSA")
 
 # Decrypt RSA with AES
-messageDecryptAES = aesCBC.decrypted(cipherTextChunk, ivChunk, sessionKeyChunk)
+messageDecryptAES = aesCBC.decrypted(splitSecretContent[0], splitSecretContent[1], sessionKeyDecryptRSA)
 
-output = ("Cipher text: " + b64encode(cipherTextChunk).decode('utf-8') + "\n" +
-          "Initial vector: " + b64encode(ivChunk).decode('utf-8') + "\n" +
-          "Session key: " + b64encode(sessionKeyChunk).decode('utf-8') + "\n" +
-          "Salt: " + b64encode(saltChunk).decode('utf-8') + "\n" +
-          "Private key: " + privatekeyChunk + "\n"
+output = ("Cipher text: " + b64encode(splitSecretContent[0]).decode('utf-8') + "\n" +
+          "Initial vector: " + b64encode(splitSecretContent[1]).decode('utf-8') + "\n" +
+          "Session key: " + b64encode(sessionKeyDecryptRSA).decode('utf-8') + "\n" +
+          "Salt: " + b64encode(splitSecretContent[3]).decode('utf-8') + "\n" +
+          "Private key: " + splitSecretContent[4] + "\n"
           "Message: " + messageDecryptAES
           )
 
