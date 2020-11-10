@@ -1,4 +1,5 @@
 import argparse
+from Crypto.Hash import MD5
 from base64 import b64encode
 import cv2
 import algorithms as alg
@@ -61,22 +62,31 @@ def extracMsg(pick, password):
 	sessionKeyDecryptRSA = rsa.decrypted(splitSecretContent[2], splitSecretContent[4])
 	print("Session key decrypted with RSA")
 
-	# Decrypt RSA with AES
-	aesCBC = alg.CipherAES()
-	messageDecryptAES = aesCBC.decrypted(splitSecretContent[0], splitSecretContent[1], sessionKeyDecryptRSA)
+	# Password is hashed
+	expandKey = str.encode(password) + splitSecretContent[3]
+	h = MD5.new()
+	h.update(expandKey)
+	validatePassword = h.digest() 
 
-	output = ("Cipher text: " + b64encode(splitSecretContent[0]).decode('utf-8') + "\n" +
-	          "Initial vector: " + b64encode(splitSecretContent[1]).decode('utf-8') + "\n" +
-	          "Session key: " + b64encode(sessionKeyDecryptRSA).decode('utf-8') + "\n" +
-	          "Salt: " + b64encode(splitSecretContent[3]).decode('utf-8') + "\n" +
-	          "Private key: " + splitSecretContent[4] + "\n"
-	          "Message: " + messageDecryptAES
-	          )
+	if (validatePassword == sessionKeyDecryptRSA):
+		# Decrypt RSA with AES
+		aesCBC = alg.CipherAES()
+		messageDecryptAES = aesCBC.decrypted(splitSecretContent[0], splitSecretContent[1], sessionKeyDecryptRSA)
 
-	outputDecrypted = open("output-decrypted.txt", "wb")
-	outputDecrypted.write(output)
-	outputDecrypted.close()
-	print("Image decrypted")
+		output = ("Cipher text: " + b64encode(splitSecretContent[0]).decode('utf-8') + "\n" +
+		          "Initial vector: " + b64encode(splitSecretContent[1]).decode('utf-8') + "\n" +
+		          "Session key: " + b64encode(sessionKeyDecryptRSA).decode('utf-8') + "\n" +
+		          "Salt: " + b64encode(splitSecretContent[3]).decode('utf-8') + "\n" +
+		          "Private key: " + splitSecretContent[4] + "\n"
+		          "Message: " + messageDecryptAES
+		          )
+
+		outputDecrypted = open("output-decrypted.txt", "wb")
+		outputDecrypted.write(output)
+		outputDecrypted.close()
+		print("Image decrypted")
+	else:
+		print("Password invalid")
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Steganography schema, which use AES-CBC and RSA')
@@ -91,5 +101,5 @@ if __name__ == '__main__':
 
 	if args.hidden:
 		hiddenMesg(args.pick, args.password)
-	else args.extrac:
+	else:
 		extracMsg(args.pick, args.password)
