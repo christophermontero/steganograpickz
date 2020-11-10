@@ -1,6 +1,5 @@
 from base64 import b64encode
 import cv2
-
 import algorithms as alg
 import steganography as stegano
 
@@ -53,10 +52,8 @@ privatekeyChunk = imageDecrypted[len(messageEncryptAES[0]) + 32 + 256 : len(mess
 
 # Decrypt session key with RSA
 sessionKeyChunk = rsa.decrypted(sessionKeyRSAChunk, privatekeyChunk)
-print(len(sessionKeyChunk))
-print(sessionKeyChunk)
 
-'''
+
 # Decrypt RSA with AES
 messageDecryptAES = aesCBC.decrypted(cipherTextChunk, ivChunk, sessionKeyChunk)
 
@@ -64,10 +61,10 @@ output = ("Cipher text: " + b64encode(cipherTextChunk).decode('utf-8') + "\n" +
           "Initial vector: " + b64encode(ivChunk).decode('utf-8') + "\n" +
           "Session key: " + b64encode(sessionKeyChunk).decode('utf-8') + "\n" +
           "Salt: " + b64encode(saltChunk).decode('utf-8') + "\n" +
-          "Message: " + messageDecryptAES + "\n"
+          "Private key: " + privatekeyChunk + "\n"
+          "Message: " + messageDecryptAES
           )
 
 outputDecrypted = open("output-decrypted.txt", "wb")
 outputDecrypted.write(output)
 outputDecrypted.close()
-'''
