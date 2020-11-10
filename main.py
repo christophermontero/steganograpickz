@@ -13,9 +13,9 @@ def hiddenMesg(pick, password):
 
 	# Encrypt message with AES
 	print("The message is been encrypted with AES...")
-	aesCBC = alg.CipherAES(message, password)
-	aesCBC.expandSessionKey()
-	messageEncryptAES = aesCBC.encrypted()
+	aesCBC = alg.CipherAES()
+	aesCBC.expandSessionKey(password)
+	messageEncryptAES = aesCBC.encrypted(message)
 	print("Message encrypted with AES")
 
 	# Encrypt AES session key with RSA

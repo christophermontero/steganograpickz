@@ -40,18 +40,19 @@ class CipherRSA():
 
 
 class CipherAES():
-    def __init__(self, text, password):
-        self.password = password
-        self.plainText = text
-        self.plainText2Bytes = str.encode(self.plainText)
+    def __init__(self):
+        self.password = None
+        self.plainText = None
+        self.plainText2Bytes = None
         self.salt = None
         self.sessionKey = None
         self.cipherText = None
         self.iv = None
         self.plainTextDecrypt = None
 
-    def expandSessionKey(self):
+    def expandSessionKey(self, password):
         self.salt = get_random_bytes(16)
+        self.password = password
         expandKey = str.encode(self.password) + self.salt
 
         # Password is hashed
@@ -61,7 +62,9 @@ class CipherAES():
 
         return self.sessionKey
 
-    def encrypted(self):
+    def encrypted(self, text):
+        self.plainText = text
+        self.plainText2Bytes = str.encode(self.plainText)
         # Cipher AES is called
         cipherAES = AES.new(self.sessionKey, AES.MODE_CBC)
         self.cipherText = cipherAES.encrypt(pad(self.plainText2Bytes, AES.block_size))
